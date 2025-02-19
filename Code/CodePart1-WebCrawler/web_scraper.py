@@ -2,7 +2,8 @@ import sys
 import urllib.request as urllib
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
-import langid
+import langid #language identifier
+import threading as threads
 
 
 def read_webpage(url):
@@ -60,25 +61,44 @@ def url_format(url):
     except AttributeError:
         return False
 
+def unique_filename(url, replace_char = '!'):
+    """Given a URL, it returns a unique name
+    Argument: url (string): a URL to generate unique name \n
+    Returns: string value of a unique name"""
+    try:
+        return urlparse(url).path.replace('/',replace_char)
+    except AttributeError:
+        return None
+
 def detect_language(text):
     """Using the langid library, it returns the language of a string sequence \n
     Arguments: text (string): the text to identify\n
     Returns: language of given input
     """
+    #Joseph Note:
+    #for report, I used the langid library because it's not "sensitive to domain-specific features"
+    #like HTML or XML markup
     return langid.classify(text)[0]
 
-def main():
-    url = "https://www.google.com"
 
+def web_scraper(url):
     if not url_format(url):
         # work on code to handle malformed url strings
         print("Bad URL")
         sys.exit()
 
     web_string = read_webpage(url)
+
     web_string_language = detect_language(web_string)
     print(web_string, web_string_language)
-    download_to_file(web_string, "web_scrape_demo")
+    download_to_file(web_string, unique_filename(url))
+
+def main():
+    url = "https://www.google.com"
+    url2 = "https://www.cnn.com/2025/02/19/science/royal-tomb-thutmose-ii-discovered-egypt-intl-scli/index.html"
+    url3 = "https://www.bbc.com/news/articles/cjev2j70v19o"
+    web_scraper(url2)
+
 
 if __name__=="__main__":
     main()
