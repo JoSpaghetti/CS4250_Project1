@@ -68,7 +68,8 @@ def detect_language(text):
     return langid.classify(text)[0]
 
 def main():
-    url = "https://www.google.com"
+    #url = "https://www.google.com"
+    url = "https://www.bbc.com/travel/article/20250218-jasper-canadas-remote-but-accessible-dark-sky-sanctuary"
 
     if not url_format(url):
         # work on code to handle malformed url strings
