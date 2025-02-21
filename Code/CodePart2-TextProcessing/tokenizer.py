@@ -64,19 +64,19 @@ def process_repository(directory):
             filepath = os.path.join(directory, file) # construct the full file path for the current html file
             tokens, stemmed_text = text_process(filepath)
 
-            # ADD CODE TO WRITE PROCESSED TEXT TO .TXT FILE
-            tokenized_file = os.path.join(output_dir, f"{file}_tokenized.txt")
-            stemmed_file = os.path.join(output_dir, f"{file}_stemmed.txt") # the output file path
+            # construct the output file path
+            # tokenized_file = os.path.join(output_dir, f"{file}_tokenized.txt")
+            stemmed_file = os.path.join(output_dir, f"{file}_stemmed.txt") 
             
             # Save tokenized text
-            with open(tokenized_file, "w", encoding="utf-8") as out:
-                out.write(" ".join(tokens))
+            #with open(tokenized_file, "w", encoding="utf-8") as out:
+            #    out.write(" ".join(tokens))
 
             # Save stemmed text
             with open(stemmed_file, "w", encoding="utf-8") as out: # write the processed text to a new .txt file
                 out.write(" ".join(stemmed_text)) # join the tokens into a space-separated string
 
-            print(f"Processed: {file} → Tokenized: {tokenized_file} | Stemmed: {stemmed_file}")
+            print(f"Processed: {file} → Stemmed: {stemmed_file}")
 
 
 def main():
