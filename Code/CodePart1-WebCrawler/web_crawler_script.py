@@ -20,19 +20,18 @@ def main():
     spanish_article_list = ["James_Whale",
                             "Hollywood",
                             "Nueva_York"]
-    initialize_crawler(article_list=spanish_article_list, lan_char="es", directory_name="Spanish_Wikipedia_Test2")
-
+    initialize_crawler(article_list=spanish_article_list, lan_char="es", directory_name="Spanish_Wikipedia_Test")
     #English Language List
     english_article_list = ["Main_Page",
                             "American_Revolutionary_War",
                             "Whitehead's_trogon"]
-    initialize_crawler(article_list=english_article_list, lan_char="en", directory_name="English_Wikipedia_Test2")
+    initialize_crawler(article_list=english_article_list, lan_char="en", directory_name="English_Wikipedia_Test")
 
     #German Language List
     german_article_list = ["Paris",
                            "Industrialisierung",
                            "E-Sport"]
-    initialize_crawler(article_list=german_article_list, lan_char="de", directory_name="German_Wikipedia_Test2")
+    initialize_crawler(article_list=german_article_list, lan_char="de", directory_name="German_Wikipedia_Test")
 
 if __name__ == "__main__":
     main()

@@ -17,7 +17,7 @@ def clean_HTML(html_doc):
         tags.decompose()  # removes script and style tags
 
     # extracts text from HTML and returns it as a string
-    cleaned_text = soup.get_text(separator=' ')  # separator checks for spacing between tags
+    cleaned_text = soup.get_text(separator=" ")  # separator checks for spacing between tags
     return cleaned_text
 
 
@@ -60,8 +60,8 @@ def process_repository(directory):
     This function applies text processing to the HTML files in a given directory.
     Save both tokenized and stemmed outputs to separate .txt files.
     """
-    output_dir = os.path.join("Code/CodePart2-TextProcessing", os.path.basename(
-        directory) + "_Processed_Text")  # create a full path for the output folder
+    output_dir = (os.path.join
+                  (f"{os.path.basename(directory)}_Processed_Text"))  # create a relative path for the output folder
     os.makedirs(output_dir, exist_ok=True)  # ensure output directory exists
 
     for file in os.listdir(directory):  # traverses all files in a directory
@@ -71,18 +71,11 @@ def process_repository(directory):
             tokens, stemmed_text = text_process(filepath)
 
             # construct the output file path
-            # tokenized_file = os.path.join(output_dir, f"{file}_tokenized.txt")
             stemmed_file = os.path.join(output_dir, f"{file}_stemmed.txt")
-
-            # Save tokenized text
-            # with open(tokenized_file, "w", encoding="utf-8") as out:
-            #    out.write(" ".join(tokens))
 
             # Save stemmed text
             with open(stemmed_file, "w", encoding="utf-8") as out:  # write the processed text to a new .txt file
                 out.write(" ".join(stemmed_text))  # join the tokens into a space-separated string
-            # print(f"Processed: {file} → Stemmed: {stemmed_file}")
-
 
 def main():
     """
@@ -93,11 +86,12 @@ def main():
     project_root = os.path.dirname(os.path.dirname(current_dir))
 
     # find directory paths relative to project root
+
     directories = [
         os.path.join(project_root, "Code/CodePart1-WebCrawler/repository_German_Wikipedia_Test"),
         os.path.join(project_root, "Code/CodePart1-WebCrawler/repository_Spanish_Wikipedia_Test"),
         os.path.join(project_root, "Code/CodePart1-WebCrawler/repository_Wikipedia Test")
-    ]
+        ]
 
     for directory in directories:
         print(f"Processing HTML files in: {os.path.abspath(directory)}")
