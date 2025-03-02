@@ -1,9 +1,10 @@
+import argparse
 import csv
 import os
-from queue import Queue
-from urllib.parse import urljoin, urlparse
 import langid
 import requests
+from queue import Queue
+from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
 class WebCrawler:
@@ -77,7 +78,7 @@ class WebCrawler:
 
         with open(self.report_file, "w", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["URL", "Outlinks"])
+            writer.writerow(["URL", "Out-links"])
 
             while not self.to_crawl.empty() and len(self.visited_urls) < self.max_pages:
                 url = self.to_crawl.get()
@@ -95,39 +96,25 @@ class WebCrawler:
                     continue
 
                 self.save_page(url, html_content)
-                print(self.detect_language(html_content))
-                outlinks = self.extract_links(html_content, url)
+                out_links = self.extract_links(html_content, url)
 
-                writer.writerow([url, len(outlinks)])
+                writer.writerow([url, len(out_links)])
                 
-                for link in outlinks:
+                for link in out_links:
                     if link not in self.visited_urls:
                         self.to_crawl.put(link)
 
 if __name__ == "__main__":
-    #quick refactor since CLI kept responding with errors
-    wiki_seed_urls = []
-    spanish_article_list = ["Derecho_internacional_humanitario",
-                    "Clásico_rosarino",
-                    "Delta_Air_Lines"]
-    for article in spanish_article_list:
-        wiki_seed_urls.append(f"https://es.wikipedia.org/wiki/{article}")
-
-    crawler = WebCrawler(seed_urls=wiki_seed_urls,
-                         allowed_domains=["es.wikipedia.org"],
-                         crawl_id="Spanish_Wikipedia_Test",
-                         max_pages=60,
-                         language="es")
-    """
     parser = argparse.ArgumentParser(description="CLI Web Crawler")
     parser.add_argument("-s", "--seeds", nargs="+", required=True, help="List of seed URLs to start crawling from")
     parser.add_argument("-d", "--domains", nargs="+", required=True, help="List of allowed domains for crawling")
     parser.add_argument("-i", "--id", type=str, required=True, help="Unique identifier for this crawl")
     parser.add_argument("--depth", type=int, default=50, help="Maximum number of pages to crawl (default: 50)")
-    parser.add_argument("--language", type=str, default="en", help="Language to use (default: en)\nCodes are "en"->English, "de"->German, "es"->Spanish)
+    parser.add_argument("--language", type=str, default="en", help="Language to use (default: en)\nCodes are 'en'->English, 'de'->German, 'es'->Spanish")
+
     args = parser.parse_args()
     
     crawler = WebCrawler(args.seeds, args.domains, args.id, args.depth, args.language)
-    """
+
     crawler.crawl()
     print(f"Crawling completed. Data saved in {crawler.repository_path}/ and {crawler.report_file}")
