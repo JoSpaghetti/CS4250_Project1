@@ -1,4 +1,3 @@
-import argparse
 import csv
 import os
 import langid
@@ -6,6 +5,32 @@ import requests
 from queue import Queue
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
+
+
+def download_page(url):
+    """Download and save the HTML content of the page.
+    :arg url: The URL to download
+    :returns text of html response string
+    """
+    try:
+        response = requests.get(url, timeout=5, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        print(f"Failed to download {url}: {e}")
+        return None
+
+
+def detect_language(text):
+    """Using the langid library, it returns the language of a string sequence \n
+    :argument text: the text to identify \n
+    :returns language of given input
+    """
+    if text is None or text == "":
+        return None
+
+    return langid.classify(text)[0]
+
 
 class WebCrawler:
     def __init__(self, seed_urls, allowed_domains, crawl_id, max_pages=50, language="en"):
@@ -26,19 +51,6 @@ class WebCrawler:
         :return: True if the URL is within the allowed domain(s)."""
         parsed_url = urlparse(url)
         return any(domain in parsed_url.netloc for domain in self.allowed_domains)
-
-    def download_page(self, url):
-        """Download and save the HTML content of the page.
-        :arg url: The URL to download
-        :returns text of html response string
-        """
-        try:
-            response = requests.get(url, timeout=5, headers={"User-Agent": "Mozilla/5.0"})
-            response.raise_for_status()
-            return response.text
-        except requests.RequestException as e:
-            print(f"Failed to download {url}: {e}")
-            return None
 
     def save_page(self, url, content):
         """Save the HTML page to the repository.
@@ -61,16 +73,6 @@ class WebCrawler:
                 links.add(absolute_url)
         return links
 
-    def detect_language(self, text):
-        """Using the langid library, it returns the language of a string sequence \n
-        :argument text: the text to identify \n
-        :returns language of given input
-        """
-        if text is None or text == "":
-            return None
-
-        return langid.classify(text)[0]
-
     def crawl(self):
         """Crawl web pages starting from the seed URLs."""
         for url in self.seed_urls:
@@ -86,35 +88,22 @@ class WebCrawler:
                     continue
 
                 print(f"Crawling: {url}")
-                html_content = self.download_page(url)
+                html_content = download_page(url)
                 if not html_content: #if html_content is None
                     continue
 
-                self.visited_urls.add(url)
-
-                if self.detect_language(html_content) != self.language:
+                #print(detect_language(html_content))
+                if detect_language(html_content) != self.language:
                     continue
 
+                self.visited_urls.add(url)
                 self.save_page(url, html_content)
                 out_links = self.extract_links(html_content, url)
 
+                #write url to report.csv
                 writer.writerow([url, len(out_links)])
                 
                 for link in out_links:
                     if link not in self.visited_urls:
                         self.to_crawl.put(link)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CLI Web Crawler")
-    parser.add_argument("-s", "--seeds", nargs="+", required=True, help="List of seed URLs to start crawling from")
-    parser.add_argument("-d", "--domains", nargs="+", required=True, help="List of allowed domains for crawling")
-    parser.add_argument("-i", "--id", type=str, required=True, help="Unique identifier for this crawl")
-    parser.add_argument("--depth", type=int, default=50, help="Maximum number of pages to crawl (default: 50)")
-    parser.add_argument("--language", type=str, default="en", help="Language to use (default: en)\nCodes are 'en'->English, 'de'->German, 'es'->Spanish")
-
-    args = parser.parse_args()
-    
-    crawler = WebCrawler(args.seeds, args.domains, args.id, args.depth, args.language)
-
-    crawler.crawl()
-    print(f"Crawling completed. Data saved in {crawler.repository_path}/ and {crawler.report_file}")
